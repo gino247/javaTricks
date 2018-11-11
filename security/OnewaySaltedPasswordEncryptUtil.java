@@ -45,7 +45,7 @@ public abstract class OnewaySaltedPasswordEncryptUtil {
         // http://blog.crackpassword.com/2010/09/smartphone-forensics-cracking-blackberry-backup-passwords/
         iteration = (iteration < 1000) ? 2000:iteration;
 
-        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iterations, derivedKeyLength);
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, iteration, derivedKeyLength);
 
         SecretKeyFactory f = SecretKeyFactory.getInstance(algorithm);
 
