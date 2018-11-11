@@ -9,13 +9,23 @@ import java.util.Arrays;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-public abstract class OnewayPasswordEncryptUtil {
+public abstract class OnewaySaltedPasswordEncryptUtil {
+    private static final SecureRandom random;
     
-    public static boolean authenticate(String attemptedPassword, byte[] encryptedPassword, byte[] salt)
+    static {
+        try {
+            // VERY important to use SecureRandom instead of just Random
+            random = SecureRandom.getInstance("SHA1PRNG");
+        } catch (Exception ex) {
+            throw new RuntimeException (ex);
+        }
+     }
+    
+    public static boolean authenticate(String attemptedPassword, byte[] encryptedPassword, byte[] salt, int iterations)
             throws NoSuchAlgorithmException, InvalidKeySpecException {
         // Encrypt the clear-text password using the same salt that was used to
         // encrypt the original password
-        byte[] encryptedAttemptedPassword = getEncryptedPassword(attemptedPassword, salt);
+        byte[] encryptedAttemptedPassword = getEncryptedPassword(attemptedPassword, salt, iterations);
         // Authentication succeeds if encrypted password that the user entered
         // is equal to the stored hash
         return Arrays.equals(encryptedPassword, encryptedAttemptedPassword);
@@ -43,14 +53,10 @@ public abstract class OnewayPasswordEncryptUtil {
     }
     
     public static byte[] generateSalt() throws NoSuchAlgorithmException {
-        // VERY important to use SecureRandom instead of just Random
-        SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-
         // Generate a 8 byte (64 bit) salt as recommended by RSA PKCS5
         byte[] salt = new byte[8];
         random.nextBytes(salt);
-
         return salt;
-    }
+    }    
     
 }
